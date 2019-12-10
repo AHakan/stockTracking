@@ -1,0 +1,148 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="../assets/bootstrap.min.css" />
+	<link rel="stylesheet" href="../assets/style.css"/>
+    <title>Ara</title>
+</head>
+<body>
+	<nav class="navbar navbar-light bg-light">
+	    <a class="navbar-brand" href="#">
+	      <img src="../assets/search.png" width="30" height="30" class="d-inline-block align-top" alt="">
+	      Ürün Ara
+	    </a>
+	    <button type="button" class="close" aria-label="Close" id="searchCancel">
+				<span aria-hidden="true">&times;</span>
+		</button>
+		<div class="container">
+		<br><br>
+			<div class="input-group mb-3">
+				<input type="text" class="form-control" placeholder="Barkod no giriniz" aria-label="Barkod no giriniz" aria-describedby="button-addon2" id="searchBarkod">
+				<div class="input-group-append">
+					<button class="btn btn-outline-secondary" type="button" id="searchButton">Ara</button>
+				</div>
+			</div>
+		</div>
+  	</nav>
+	
+	<ul class="list-group list-group-horizontal" id="searchMenu">
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </li>
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp;&nbsp;&nbsp; Marka &nbsp;&nbsp;&nbsp;&nbsp;</li>
+				<li class="list-group-item list-group-item-dark">Barkod Numarası</li>
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; Adet &nbsp;&nbsp;</li>
+				<li class="list-group-item list-group-item-dark">Son Kullanma Tarihi</li>
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; Fiyat &nbsp;&nbsp;</li>
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;</li>
+
+	</ul>
+	<div class="container">
+		<div class="container2">
+		</div>
+		
+	</div>
+	
+	<script>
+	    const electron = require("electron");
+	    const { ipcRenderer } = electron;
+
+	    let cancelSearch = document.querySelector("#searchCancel");
+	    cancelSearch.addEventListener("click", ()=>{
+	        ipcRenderer.send("search:Close");
+        });
+        
+        let aramaBarkod = document.querySelector("#searchBarkod")
+        let aramaButon = document.querySelector("#searchButton")
+
+        aramaButon.addEventListener("click", ()=>{
+            ipcRenderer.send("search:Barkod", aramaBarkod.value)
+        })
+
+        ipcRenderer.on("searchSonuc", (e, Products)=>{
+			Products.forEach(product => {
+				const container = document.querySelector(".container2")
+
+				const ul = document.createElement("ul")
+				ul.className = "list-group list-group-horizontal"
+
+				const li = document.createElement("li")
+				li.className = "list-group-item d-inline-flex kutu6"
+				li.innerText = product.BarkodNo
+				const li1 = document.createElement("li")
+				li1.className = "list-group-item d-inline-flex kutu1"
+				li1.innerText = product.UrunAd
+				const li2 = document.createElement("li")
+				li2.className = "list-group-item d-inline-flex kutu2"
+				li2.innerText = product.UrunMarka
+				const li3 = document.createElement("li")
+				li3.className = "list-group-item d-inline-flex kutu3"
+				li3.innerText = product.UrunAdet
+				const li4 = document.createElement("li")
+				li4.className = "list-group-item d-inline-flex kutu4"
+				li4.innerText = product.UrunSKT
+				const li5 = document.createElement("li")
+				li5.className = "list-group-item d-inline-flex kutu5"
+				li5.innerText = product.UrunFiyat + " ₺"
+
+
+
+				const delButton = document.createElement("button")
+				delButton.className = "btn btn-link"
+				delButton.type = "button"
+
+				delButton.setAttribute("data-id", product.BarkodNo)
+				
+				const deleteImg = document.createElement("img")
+				deleteImg.src = "../assets/trash.png"
+				deleteImg.id = "deletebutton"
+				deleteImg.setAttribute("data-id", product.BarkodNo)
+
+				const editButton = document.createElement("button")
+				editButton.className = "btn btn-link"
+				editButton.type = "button"
+				
+				const editImg = document.createElement("img")
+				editImg.src = "../assets/edit.png"
+				editImg.id = "deletebutton"
+				
+				delButton.appendChild(deleteImg);
+				editButton.appendChild(editImg);
+				container.appendChild(ul);
+				container.appendChild(li1);
+				container.appendChild(li2);
+				container.appendChild(li);
+				container.appendChild(li3);
+				container.appendChild(li4);
+				container.appendChild(li5);
+				container.appendChild(editButton);
+                container.appendChild(delButton);
+                
+                var i=0
+                i=i+1
+                aramaButon.addEventListener("click", ()=>{
+                    delButton.removeChild(deleteImg)
+                    editButton.removeChild(editImg)
+                    container.removeChild(ul)
+                    container.removeChild(li1)
+                    container.removeChild(li2)
+                    container.removeChild(li3)
+                    container.removeChild(li4)
+                    container.removeChild(li5)
+                    container.removeChild(li)
+                    container.removeChild(editButton)
+                    container.removeChild(delButton)
+                })
+
+				/*delButton.addEventListener("click", e =>{
+					e.target.parentNode.parentNode.remove();
+					ipcRenderer.send("remove:Data", e.target.getAttribute("data-id"))
+				})*/
+			});
+		})
+	</script>
+</body>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "VTYS",
+  "productName": "Veritabanı Projesi",
+  "description": "Veritabanı Yönetim Sistemleri Dersi Projesi",
+  "keywords": [],
+  "main": "./main.js",
+  "version": "1.0.0",
+  "author": "matrev",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "aws-sdk": "^2.585.0",
+    "mysql": "^2.17.1"
+  },
+  "devDependencies": {
+    "electron": "^8.0.0-beta.4",
+    "electron-packager": "^14.1.1"
+  }
+}

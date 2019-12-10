@@ -1,0 +1,39 @@
+<!DOCTYPE html5>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Stok Takip Sistemi</title>
+  <link rel="stylesheet" href="assets/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+      <img src="assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+      Stok Takip Sistemi
+    </a>  
+    <button type="button" class="close" aria-label="Close" id="butonCikis">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </nav>
+
+  <div class="container">
+    <br>
+    <button type="button" class="btn btn-primary btn-lg btn-block" id="openAddProduct">Ürün Ekle</button>
+    <button type="button" class="btn btn-success btn-lg btn-block" id="openSearchProduct">Ürün Ara</button>
+    <button type="button" class="btn btn-secondary btn-lg btn-block" id="openCatalogProduct">Ürün Katalog</button>
+	<br>
+	<div class="row">
+		<div class="col col-sm-6 col-md-6 col-lg-6">
+			<button type="button" class="btn btn-warning btn-lg btn-block">Kategori Listesi</button>
+		</div>
+		<div class="col col-sm-6 col-md-6 col-lg-6">
+			<button type="button" class="btn btn-dark btn-lg btn-block">Kullanıcı Listesi</button>
+		</div>
+	</div>
+  </div>
+  <script>
+    require('./renderer.js')
+  </script>
+</body>
+</html>

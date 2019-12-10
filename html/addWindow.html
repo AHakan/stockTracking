@@ -1,0 +1,99 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="../assets/bootstrap.min.css" />
+	<link rel="stylesheet" href="../assets/style.css"/>
+    <title>Ekle</title>
+</head>
+<body>
+	<nav class="navbar navbar-light bg-light">
+	    <a class="navbar-brand" href="#">
+	      <img src="../assets/addicon.png" width="30" height="30" class="d-inline-block align-top" alt="">
+	      Ürün Ekle
+	    </a>
+	    <button type="button" class="close" aria-label="Close" id="addCancel">
+				<span aria-hidden="true">&times;</span>
+		</button>
+  	</nav>
+	<div class="container">
+		<form class="needs-validation" id="validationCustom"novalidate>
+			<div class="form-row">
+				<label for="validationCustom01">Ürün Adı</label>
+				<input type="text" class="form-control" id="validationCustom01" placeholder="Ürün adı" required>
+				
+				<label for="validationCustom02">Ürün Markası</label>
+				<input type="text" class="form-control" id="validationCustom02" placeholder="Ürün markası">
+				
+				<label for="validationCustom03">Barkod Numarası</label>
+				<input type="text" class="form-control" id="validationCustom03" placeholder="Barkod no" required>
+				
+				<label for="validationCustom04">Ürün Adet</label>
+				<input type="text" class="form-control" id="validationCustom04" placeholder="Ürün adet" required>
+				
+				<label for="validationCustom05">Ürün Son Kullanma Tarihi</label>
+				<input type="date" class="form-control" id="validationCustom05" placeholder="Ürün SKT" required pattern="\d{2}-\d{2}-\d{4}">
+
+				<label for="validationCustom05">Ürün Fiyat</label>
+				<input type="text" class="form-control" id="validationCustom06" placeholder="Ürün Fiyat" required>
+				
+			</div>
+			<button class="btn btn-primary" type="submit" id="addAdd">Ekle</button>
+		</form>
+		<script>
+				// Example starter JavaScript for disabling form submissions if there are invalid fields
+				(function() {
+				  'use strict';
+				  window.addEventListener('load', function() {
+					// Fetch all the forms we want to apply custom Bootstrap validation styles to
+					var forms = document.getElementsByClassName('needs-validation');
+					// Loop over them and prevent submission
+					var validation = Array.prototype.filter.call(forms, function(form) {
+					  form.addEventListener('submit', function(event) {
+						if (form.checkValidity() === false) {
+						  event.preventDefault();
+						  event.stopPropagation();
+						}
+						form.classList.add('was-validated');
+					  }, false);
+					});
+				  }, false);
+				})();
+		</script>
+			
+	</div>
+
+
+
+	<script>
+	    const electron = require("electron");
+	    const { ipcRenderer } = electron;
+
+	    let cancelAdd = document.querySelector("#addCancel");
+	    cancelAdd.addEventListener("click", ()=>{
+	        ipcRenderer.send("add:Close");
+	    });
+
+	    let urunAd = document.querySelector("#validationCustom01")
+	    let urunMarka = document.querySelector("#validationCustom02")
+	    let urunBarkod = document.querySelector("#validationCustom03")
+	    let urunAdet = document.querySelector("#validationCustom04")
+	    let urunTarih = document.querySelector("#validationCustom05")
+	    let urunFiyat = document.querySelector("#validationCustom06")
+
+	    let addAdd = document.querySelector("#addAdd")
+	    addAdd.addEventListener("click", ()=>{
+	    	ipcRenderer.send("add:Item1", urunAd.value);
+	    	ipcRenderer.send("add:Item2", urunMarka.value);
+	    	ipcRenderer.send("add:Item3", urunBarkod.value);
+	    	ipcRenderer.send("add:Item4", urunAdet.value);
+	    	ipcRenderer.send("add:Item5", urunTarih.value);
+	    	ipcRenderer.send("add:Item6", urunFiyat.value);
+	    });
+	</script>
+</body>
+</body>
+</html>
