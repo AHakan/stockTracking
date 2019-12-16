@@ -13,6 +13,14 @@ let openSearch = document.querySelector("#openSearchProduct");
 openSearch.addEventListener("click", ()=>{
     ipcRenderer.send("search:Open");
 })
+let openCategories = document.querySelector("#openCategoriesWindow");
+openCategories.addEventListener("click", ()=>{
+    ipcRenderer.send("categories:Open");
+})
+let openUser = document.querySelector("#openUserWindow");
+openUser.addEventListener("click", ()=>{
+    ipcRenderer.send("user:Open");
+})
 let closeButton = document.querySelector("#butonCikis");
 closeButton.addEventListener("click", ()=> {
     ipcRenderer.send("index:Close")
@@ -26,6 +34,7 @@ ipcRenderer.on("eklemeOnay", (e, mesaj)=>{
     const div = document.createElement("div")
     div.className = "alert alert-success"
     div.role = "alert"
+    div.id = "ekleme"
     div.innerText = mesaj;
     
     container.appendChild(div);
@@ -40,6 +49,7 @@ ipcRenderer.on("eklemeOlmadi", (e, mesaj2)=>{
     const div2 = document.createElement("div")
     div2.className = "alert alert-danger"
     div2.role = "alert"
+    div2.id = "eklemehata"
     div2.innerText = mesaj2;
     
     container.appendChild(div2);

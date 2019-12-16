@@ -20,7 +20,7 @@
 		</button>
 		<div class="container">
 		<br><br>
-			<div class="input-group mb-3">
+			<div class="input-group mb-3" id="searchkutu">
 				<input type="text" class="form-control" placeholder="Barkod no giriniz" aria-label="Barkod no giriniz" aria-describedby="button-addon2" id="searchBarkod">
 				<div class="input-group-append">
 					<button class="btn btn-outline-secondary" type="button" id="searchButton">Ara</button>
@@ -36,7 +36,9 @@
 				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; Adet &nbsp;&nbsp;</li>
 				<li class="list-group-item list-group-item-dark">Son Kullanma Tarihi</li>
 				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; Fiyat &nbsp;&nbsp;</li>
-				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;</li>
+				<li class="list-group-item list-group-item-dark"> &nbsp; Kategori &nbsp;</li>
+				<li class="list-group-item list-group-item-dark"> Düzenleyen </li>
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; </li>
 
 	</ul>
 	<div class="container">
@@ -69,7 +71,7 @@
 				ul.className = "list-group list-group-horizontal"
 
 				const li = document.createElement("li")
-				li.className = "list-group-item d-inline-flex kutu6"
+				li.className = "list-group-item d-inline-flex kutu"
 				li.innerText = product.BarkodNo
 				const li1 = document.createElement("li")
 				li1.className = "list-group-item d-inline-flex kutu1"
@@ -86,29 +88,26 @@
 				const li5 = document.createElement("li")
 				li5.className = "list-group-item d-inline-flex kutu5"
 				li5.innerText = product.UrunFiyat + " ₺"
+				const li6 = document.createElement("li")
+				li6.className = "list-group-item d-inline-flex kutu6"
+				li6.innerText = product.name
+				const li7 = document.createElement("li")
+				li7.className = "list-group-item d-inline-flex kutu7"
+				li7.innerText = product.UserName
 
 
 
-				const delButton = document.createElement("button")
-				delButton.className = "btn btn-link"
-				delButton.type = "button"
-
-				delButton.setAttribute("data-id", product.BarkodNo)
-				
-				const deleteImg = document.createElement("img")
-				deleteImg.src = "../assets/trash.png"
-				deleteImg.id = "deletebutton"
-				deleteImg.setAttribute("data-id", product.BarkodNo)
 
 				const editButton = document.createElement("button")
 				editButton.className = "btn btn-link"
 				editButton.type = "button"
-				
+				editButton.setAttribute("data-id", product.BarkodNo)
+
 				const editImg = document.createElement("img")
 				editImg.src = "../assets/edit.png"
 				editImg.id = "deletebutton"
+				editImg.setAttribute("data-id", product.BarkodNo)
 				
-				delButton.appendChild(deleteImg);
 				editButton.appendChild(editImg);
 				container.appendChild(ul);
 				container.appendChild(li1);
@@ -117,29 +116,30 @@
 				container.appendChild(li3);
 				container.appendChild(li4);
 				container.appendChild(li5);
+				container.appendChild(li6);
+				container.appendChild(li7);
 				container.appendChild(editButton);
-                container.appendChild(delButton);
+
                 
                 var i=0
                 i=i+1
                 aramaButon.addEventListener("click", ()=>{
-                    delButton.removeChild(deleteImg)
                     editButton.removeChild(editImg)
                     container.removeChild(ul)
                     container.removeChild(li1)
                     container.removeChild(li2)
                     container.removeChild(li3)
                     container.removeChild(li4)
-                    container.removeChild(li5)
+					container.removeChild(li5)
+					container.removeChild(li6)
+					container.removeChild(li7)
                     container.removeChild(li)
                     container.removeChild(editButton)
-                    container.removeChild(delButton)
                 })
 
-				/*delButton.addEventListener("click", e =>{
-					e.target.parentNode.parentNode.remove();
-					ipcRenderer.send("remove:Data", e.target.getAttribute("data-id"))
-				})*/
+				editButton.addEventListener("click", e=>{
+					ipcRenderer.send("edit:Data", e.target.getAttribute("data-id"))
+				})
 			});
 		})
 	</script>

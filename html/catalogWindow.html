@@ -27,7 +27,9 @@
 				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; Adet &nbsp;&nbsp;</li>
 				<li class="list-group-item list-group-item-dark">Son Kullanma Tarihi</li>
 				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; Fiyat &nbsp;&nbsp;</li>
-				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;</li>
+				<li class="list-group-item list-group-item-dark"> &nbsp; Kategori &nbsp;</li>
+				<li class="list-group-item list-group-item-dark"> Düzenleyen </li>
+				<li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; </li>
 		</ul>
 	</nav>
 	<div class="container" id="catalogContainer">
@@ -55,7 +57,7 @@
 				ul.className = "list-group list-group-horizontal"
 
 				const li = document.createElement("li")
-				li.className = "list-group-item d-inline-flex kutu6"
+				li.className = "list-group-item d-inline-flex kutu"
 				li.innerText = product.BarkodNo
 				const li1 = document.createElement("li")
 				li1.className = "list-group-item d-inline-flex kutu1"
@@ -72,10 +74,16 @@
 				const li5 = document.createElement("li")
 				li5.className = "list-group-item d-inline-flex kutu5"
 				li5.innerText = product.UrunFiyat + " ₺"
+				const li6 = document.createElement("li")
+				li6.className = "list-group-item d-inline-flex kutu6"
+				li6.innerText = product.name
+				const li7 = document.createElement("li")
+				li7.className = "list-group-item d-inline-flex kutu7"
+				li7.innerText = product.UserName
 
 
 
-				const delButton = document.createElement("button")
+				/*const delButton = document.createElement("button")
 				delButton.className = "btn btn-link"
 				delButton.type = "button"
 
@@ -84,17 +92,18 @@
 				const deleteImg = document.createElement("img")
 				deleteImg.src = "../assets/trash.png"
 				deleteImg.id = "deletebutton"
-				deleteImg.setAttribute("data-id", product.BarkodNo)
+				deleteImg.setAttribute("data-id", product.BarkodNo)*/
 
 				const editButton = document.createElement("button")
 				editButton.className = "btn btn-link"
 				editButton.type = "button"
-				
+				editButton.setAttribute("data-id", product.BarkodNo)
+
 				const editImg = document.createElement("img")
 				editImg.src = "../assets/edit.png"
-				editImg.id = "deletebutton"
-				
-				delButton.appendChild(deleteImg);
+				editImg.id = "editbutton"
+				editImg.setAttribute("data-id", product.BarkodNo)
+
 				editButton.appendChild(editImg);
 				container.appendChild(ul);
 				container.appendChild(li1);
@@ -103,12 +112,17 @@
 				container.appendChild(li3);
 				container.appendChild(li4);
 				container.appendChild(li5);
+				container.appendChild(li6);
+				container.appendChild(li7);
 				container.appendChild(editButton);
-				container.appendChild(delButton);
 
-				delButton.addEventListener("click", e =>{
+				/*delButton.addEventListener("click", e =>{
 					e.target.parentNode.parentNode.remove();
 					ipcRenderer.send("remove:Data", e.target.getAttribute("data-id"))
+				})*/
+
+				editButton.addEventListener("click", e=>{
+					ipcRenderer.send("edit:Data", e.target.getAttribute("data-id"))
 				})
 			});
 		})

@@ -1,0 +1,73 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="../assets/bootstrap.min.css" />
+	<link rel="stylesheet" href="../assets/style.css"/>
+    <title>Kategori Listesi</title>
+</head>
+<body>
+	<nav class="navbar navbar-light bg-light">
+	    <a class="navbar-brand" href="#">
+	      <img src="../assets/categoriesicon.png" width="30" height="30" class="d-inline-block align-top" alt="">
+	      Kategori Listesi
+	    </a>
+	    <button type="button" class="close" aria-label="Close" id="categoriesCancel">
+				<span aria-hidden="true">&times;</span>
+		</button>
+  	</nav>
+	<div class="container">
+        <div class="input-group mb-3" id="addCategories">
+            <input type="text" class="form-control" placeholder="Kategori adı giriniz" aria-label="Kategori adı giriniz" aria-describedby="button-addon2" id="newaddCategories">
+            <div class="input-group-append" >
+                <button class="btn btn-outline-secondary" type="button" id="addCategoriesButton">Ekle</button>
+            </div>
+        </div>
+        <ul class="list-group list-group-horizontal" id="categoriesMenu">
+            <li class="list-group-item list-group-item-dark"> &nbsp;&nbsp; ID &nbsp;&nbsp; </li>
+            <li class="list-group-item list-group-item-dark"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Kategori &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+        </ul>
+    </div>
+	<script>
+	    const electron = require("electron");
+	    const { ipcRenderer } = electron;
+
+	    let categoriesCancel = document.querySelector("#categoriesCancel");
+	    categoriesCancel.addEventListener("click", ()=>{
+	        ipcRenderer.send("categories:Close");
+        });
+
+        let categoriesAdd = document.querySelector("#newaddCategories")
+        let categoriesAddButton = document.querySelector("#addCategoriesButton")
+
+        categoriesAddButton.addEventListener("click", ()=>{
+            ipcRenderer.send("categories:newAdd", categoriesAdd.value)
+        })
+
+        ipcRenderer.on("categories", (e, result)=>{
+			result.forEach(cat => {
+                const container = document.querySelector(".container")
+
+				const ul = document.createElement("ul")
+				ul.className = "list-group list-group-horizontal"
+
+				const li = document.createElement("li")
+				li.className = "list-group-item d-inline-flex categorieskutu"
+				li.innerText = cat.id
+				const li1 = document.createElement("li")
+				li1.className = "list-group-item d-inline-flex categorieskutu1"
+                li1.innerText = cat.name
+                
+                container.appendChild(ul);
+				container.appendChild(li);
+                container.appendChild(li1);
+            })
+        })
+
+	</script>
+</body>
+</body>
+</html>

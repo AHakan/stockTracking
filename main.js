@@ -1,31 +1,35 @@
-// Modules to control application life and create native browser window
+
 const {app, BrowserWindow, ipcMain} = require('electron')
 
 const db = require("./lib/connection").db
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+
 let mainWindow;
 let addWindow;
 let catalogWindow;
 let searchWindow;
+let editWindow;
+let categoriesWindow;
+let userWindow;
 var addItemList=[]
+var editItemList=[]
 var i="'";
 
+
 function createWindow () {
-  // Create the browser window.
+
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 1000,
+    width: 1300,
+    height: 768,
     frame: false,
     fullscreen: false,
     webPreferences: {
       nodeIntegration: true
     },
-    icon: "assets/logo.png"
+    icon: "assets/logo.ico"
   })
   
-  // and load the index.html of the app.
+
   mainWindow.loadFile('index.html')
   mainWindow.setResizable(false);
   mainWindow.on('closed', function () {
@@ -33,7 +37,7 @@ function createWindow () {
   })
 
   ipcMain.on("index:Close", ()=> {
-    mainWindow.close();
+    app.quit();
     mainWindow = null
   })
   ipcMain.on("add:Open", () =>{
@@ -43,6 +47,8 @@ function createWindow () {
     addWindow.close();
     addWindow = null
   })
+
+
   ipcMain.on("add:Item1", (err, data) =>{
     addItemList.push(data)
   })
@@ -59,10 +65,14 @@ function createWindow () {
     addItemList.push(data)
   })
   ipcMain.on("add:Item6", (err, data) =>{
+    addItemList.push(data)
+  })
+  ipcMain.on("add:Item7", (err, data) =>{
     addItemList.push(data);
+    addItemList.push("1");
     addWindow.close();
     addWindow = null
-    db.query("INSERT INTO Products (UrunAd, UrunMarka, BarkodNo, UrunAdet, UrunSKT, UrunFiyat) VALUES ( ? )", [addItemList], (error, result)=>{
+    db.query("INSERT INTO Products (UrunAd, UrunMarka, BarkodNo, UrunAdet, UrunSKT, UrunFiyat, catID, userID) VALUES ( ? )", [addItemList], (error, result)=>{
       if(result!=undefined){
         mainWindow.webContents.send("eklemeOnay", "Ürün başarıyla eklendi.")
       }
@@ -83,15 +93,66 @@ function createWindow () {
     catalogWindow = null
   })
   
+
+ 
   ipcMain.on("remove:Data", (err, data)=>{
+    console.log(data)
     db.query("DELETE FROM Products WHERE BarkodNo = ?", data, (e,r,f)=>{
-      //catalogWindow.webContents.send("silmeOldu", "Ürün silindi.") //HATALI BÖLÜM
+      editWindow.close();
+      editWindow = null
       catalogWindow.close();
       catalogWindow = null
+      mainWindow.webContents.send("eklemeOnay", "Ürün başarıyla silindi.")
       productCatalogWindow()
       
     })
   })
+
+  // Urun Duzenleme Sayfasi Baslangic
+  ipcMain.on("edit:Data", (err, data)=>{
+    editProductWindow()
+    editWindow.webContents.once("dom-ready", ()=>{
+      db.query("SELECT * FROM Products as p, Categories as c, Users as u WHERE p.catID=c.id and p.userID=u.UserID and p.BarkodNo = ? ", data, (e,result,f)=>{
+        editWindow.webContents.send("eskiVeri", result);
+      })
+    });
+  })
+
+  ipcMain.on("edit:Close", (err, data)=>{
+    editWindow.close();
+    editWindow = null
+  })
+
+
+  ipcMain.on("edit:Item1", (err, data) =>{
+    editItemList.push(data)
+  })
+  ipcMain.on("edit:Item2", (err, data) =>{
+    editItemList.push(data)
+  })
+  ipcMain.on("edit:Item3", (err, data) =>{
+    editItemList.push(data)
+  })
+  ipcMain.on("edit:Item4", (err, data) =>{
+    editItemList.push(data)
+  })
+  ipcMain.on("edit:Item5", (err, data) =>{
+    editItemList.push(data)
+    db.query("UPDATE Products (UrunAd, UrunMarka, BarkodNo, UrunAdet, UrunFiyat) SET ( ? )", [editItemList], (error, result)=>{
+      console.log(error)
+      console.log(editItemList)
+      console.log(result)
+      if(result!=undefined){
+        mainWindow.webContents.send("eklemeOnay", "Ürün başarıyla düzenlendi")
+      }
+      else{
+        mainWindow.webContents.send("eklemeOlmadi", "Ürün düzenleme de hata oluştu.")
+      }
+    })
+    addItemList=[]
+  })
+
+
 // Catalog Window bolumu bitis
 
 // Search Window bolumu baslangic
@@ -105,31 +166,74 @@ function createWindow () {
   })
 
   ipcMain.on("search:Barkod", (e, data)=>{
-    db.query("SELECT * FROM Products WHERE BarkodNo = ?", data, (e,r,f)=>{
+    db.query("SELECT * FROM Products as p, Categories as c, Users as u WHERE p.catID=c.id and p.userID=u.UserID and p.BarkodNo = ? ", data, (e,r,f)=>{
       searchWindow.webContents.send("searchSonuc", r);
     })
   })
 
 
+  //Kategori Window bolumu baslangic
+
+  ipcMain.on("categories:Open", ()=>{
+    productCategoriesWindow();
+  })
+
+  ipcMain.on("categories:Close", ()=>{
+    categoriesWindow.close();
+    categoriesWindow = null
+  })
+
+  ipcMain.on("categories:newAdd", (e, data)=>{
+    db.query("SELECT name FROM Categories WHERE name= ?", data, (e,result,f)=>{
+      if(result[0]==undefined){
+        db.query("INSERT INTO Categories (name) VALUES ( ? )", data, (error, result)=>{
+          if(result!=undefined){
+            mainWindow.webContents.send("eklemeOnay", "Kategori başarıyla eklendi.")
+            categoriesWindow.close();
+            categoriesWindow = null
+            productCategoriesWindow();
+          }
+        })
+      }
+      else if(result[0].name==data){
+        mainWindow.webContents.send("eklemeOlmadi", "Eklemek istediğiniz kategori zaten vardır.")
+      }
+      else{
+        db.query("INSERT INTO Categories (name) VALUES ( ? )", data, (error, result)=>{
+          if(result!=undefined){
+            mainWindow.webContents.send("eklemeOnay", "Kategori başarıyla eklendi.")
+            categoriesWindow.close();
+            categoriesWindow = null
+            productCategoriesWindow();
+          }
+        })
+      }
+    })
+
+  })
+
+
+  ipcMain.on("user:Open", ()=>{
+    userPanelWindow();
+  })
+  ipcMain.on("user:Close", ()=>{
+    userWindow.close();
+    userWindow = null
+  })
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 
-// Quit when all windows are closed.
+
 app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
+
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
 
 app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
+
   if (mainWindow === null) {
     createWindow()
   }
@@ -138,21 +242,25 @@ app.on('activate', function () {
 function addProductWindow() {
   addWindow = new BrowserWindow({
     width: 400,
-    height: 750,
+    height: 600,
     frame: false,
     webPreferences: {
       nodeIntegration: true
     }
   })
 
-  // and load the index.html of the app.
   addWindow.loadFile('html/addWindow.html')
   addWindow.setResizable(false);
 
+  addWindow.webContents.once("dom-ready", ()=>{
+    db.query("SELECT * FROM Categories ", (error, results, fields)=>{ 
+      addWindow.webContents.send("categories:addWindow", results)
+    });
+  });
 }
 function productCatalogWindow() {
   catalogWindow = new BrowserWindow({
-    width: 1100,
+    width: 1200,
     height: 500,
     frame: false,
     webPreferences: {
@@ -160,16 +268,16 @@ function productCatalogWindow() {
     }
   })
 
-  // and load the index.html of the app.
+
   catalogWindow.loadFile('html/catalogWindow.html')
   catalogWindow.setResizable(false);
 
   // Veritabanı baslangic
   catalogWindow.webContents.once("dom-ready", ()=>{
-    db.query("SELECT * FROM Products", (error, results, fields)=>{ 
+    db.query("SELECT * FROM Products as p, Categories as c, Users as u WHERE p.catID=c.id and p.userID=u.UserID", (error, results, fields)=>{ 
       catalogWindow.webContents.send("initApp", results)
     });
-    db.query("SELECT count(BarkodNo) as Adet FROM Products", (error, rescount, fields)=>{ 
+    db.query("SELECT count(p.BarkodNo) as Adet FROM Products as p WHERE p.BarkodNo!=''", (error, rescount, fields)=>{ 
       catalogWindow.webContents.send("data:Count", rescount)
     })
   });
@@ -177,7 +285,7 @@ function productCatalogWindow() {
 }
 function searchProductWindow() {
   searchWindow = new BrowserWindow({
-    width: 1100,
+    width: 1200,
     height: 300,
     frame: false,
     webPreferences: {
@@ -185,9 +293,63 @@ function searchProductWindow() {
     }
   })
 
-  // and load the index.html of the app.
+
   searchWindow.loadFile('html/searchWindow.html')
   searchWindow.setResizable(false);
 
+}
 
+
+function editProductWindow(){
+  editWindow = new BrowserWindow({
+    width: 1200,
+    height: 210,
+    frame: false,
+    webPreferences:{
+      nodeIntegration: true
+    }
+  })
+  editWindow.loadFile('html/editWindow.html')
+  editWindow.setResizable(false);
+}
+
+
+function productCategoriesWindow(){
+  categoriesWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    frame: false,
+    webPreferences:{
+      nodeIntegration: true
+    }
+  })
+
+  categoriesWindow.loadFile('html/categoriesWindow.html')
+  categoriesWindow.setResizable(false);
+
+  categoriesWindow.webContents.once("dom-ready", ()=>{
+    db.query("SELECT * FROM Categories ", (error, results, fields)=>{ 
+      categoriesWindow.webContents.send("categories", results)
+    });
+  });
+}
+
+function userPanelWindow(){
+  userWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    frame: false,
+    webPreferences:{
+      nodeIntegration: true
+    }
+  })
+
+  userWindow.loadFile('html/userWindow.html')
+  userWindow.setResizable(false);
+
+  userWindow.webContents.once("dom-ready", ()=>{
+    db.query("SELECT * FROM Users ", (error, results, fields)=>{ 
+      userWindow.webContents.send("users", results)
+    });
+  });
 }

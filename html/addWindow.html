@@ -22,47 +22,31 @@
 	<div class="container">
 		<form class="needs-validation" id="validationCustom"novalidate>
 			<div class="form-row">
-				<label for="validationCustom01">Ürün Adı</label>
 				<input type="text" class="form-control" id="validationCustom01" placeholder="Ürün adı" required>
 				
-				<label for="validationCustom02">Ürün Markası</label>
 				<input type="text" class="form-control" id="validationCustom02" placeholder="Ürün markası">
 				
-				<label for="validationCustom03">Barkod Numarası</label>
-				<input type="text" class="form-control" id="validationCustom03" placeholder="Barkod no" required>
-				
-				<label for="validationCustom04">Ürün Adet</label>
-				<input type="text" class="form-control" id="validationCustom04" placeholder="Ürün adet" required>
-				
-				<label for="validationCustom05">Ürün Son Kullanma Tarihi</label>
+				<input type="text" class="form-control" id="validationCustom03" placeholder="Barkod numarası" required>
+
+				<input type="text" class="form-control" id="validationCustom04" placeholder="Ürün adedi" required>
+
+				<input type="text" class="form-control" id="validationCustom06" placeholder="Ürün fiyatı" required>
+
 				<input type="date" class="form-control" id="validationCustom05" placeholder="Ürün SKT" required pattern="\d{2}-\d{2}-\d{4}">
 
-				<label for="validationCustom05">Ürün Fiyat</label>
-				<input type="text" class="form-control" id="validationCustom06" placeholder="Ürün Fiyat" required>
+				<select class="custom-select" id="validationCustom07">
+					<option disabled selected>Ürün kategorisi</option>
+					<!---<option value="1">Gıda</option>
+					<option value="2">Kitap</option>
+					<option value="3">Elektronik</option>
+					<option value="4">Giyim</option>
+					<option value="5">Kırtasiye</option>--->
+				</select>
 				
 			</div>
 			<button class="btn btn-primary" type="submit" id="addAdd">Ekle</button>
 		</form>
-		<script>
-				// Example starter JavaScript for disabling form submissions if there are invalid fields
-				(function() {
-				  'use strict';
-				  window.addEventListener('load', function() {
-					// Fetch all the forms we want to apply custom Bootstrap validation styles to
-					var forms = document.getElementsByClassName('needs-validation');
-					// Loop over them and prevent submission
-					var validation = Array.prototype.filter.call(forms, function(form) {
-					  form.addEventListener('submit', function(event) {
-						if (form.checkValidity() === false) {
-						  event.preventDefault();
-						  event.stopPropagation();
-						}
-						form.classList.add('was-validated');
-					  }, false);
-					});
-				  }, false);
-				})();
-		</script>
+
 			
 	</div>
 
@@ -83,6 +67,7 @@
 	    let urunAdet = document.querySelector("#validationCustom04")
 	    let urunTarih = document.querySelector("#validationCustom05")
 	    let urunFiyat = document.querySelector("#validationCustom06")
+		let urunKategori = document.querySelector("#validationCustom07")
 
 	    let addAdd = document.querySelector("#addAdd")
 	    addAdd.addEventListener("click", ()=>{
@@ -91,8 +76,22 @@
 	    	ipcRenderer.send("add:Item3", urunBarkod.value);
 	    	ipcRenderer.send("add:Item4", urunAdet.value);
 	    	ipcRenderer.send("add:Item5", urunTarih.value);
-	    	ipcRenderer.send("add:Item6", urunFiyat.value);
-	    });
+			ipcRenderer.send("add:Item6", urunFiyat.value);
+			ipcRenderer.send("add:Item7", urunKategori.value);
+		});
+		
+		ipcRenderer.on("categories:addWindow", (e, Categories)=>{
+			Categories.forEach(kategori => {
+				const container = document.querySelector("#validationCustom07")
+	
+				const option = document.createElement("option")	
+				option.value=kategori.id
+				option.innerText=kategori.name
+
+				container.appendChild(option);
+			});
+		})
+
 	</script>
 </body>
 </body>
